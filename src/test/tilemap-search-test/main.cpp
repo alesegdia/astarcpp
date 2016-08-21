@@ -63,11 +63,14 @@ public:
 		return manhattanDistance(n1, n2);
 	}
 
-	void computeNodeCosts( NodePtr parent, NodePtr child, NodePtr target_node )
+	float hCost( NodePtr src, NodePtr target )
 	{
-		child->G( parent->G() + 1 );
-		child->H( distance(child, target_node) );
-		child->computeF();
+		return distance( src, target );
+	}
+
+	float gCost( NodePtr src, NodePtr target )
+	{
+		return 1;
 	}
 
 	std::vector<NodePtr> getNeighboors( NodePtr node, NodePtr target_node )
@@ -80,25 +83,21 @@ public:
 		if( x > 0 && m_map.get( x - 1, y ) == 0 )
 		{
 			neighboors.push_back(std::make_shared<Node>( x - 1, y ));
-			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( x < m_map.cols() - 1 && m_map.get( x + 1, y ) == 0 )
 		{
 			neighboors.push_back(std::make_shared<Node>( x + 1, y ));
-			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( y > 0 && m_map.get( x, y - 1 ) == 0 )
 		{
 			neighboors.push_back(std::make_shared<Node>( x, y - 1 ));
-			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( y < m_map.rows() - 1 && m_map.get( x, y + 1 ) == 0 )
 		{
 			neighboors.push_back(std::make_shared<Node>( x, y + 1 ));
-			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		return neighboors;

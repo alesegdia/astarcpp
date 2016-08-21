@@ -129,6 +129,8 @@ private:
 		std::vector<NodePtr> neighboors = m_problemModel->getNeighboors(current_node, m_targetNode);
 		for( NodePtr neigh : neighboors )
 		{
+			neigh->G( current_node->G() + m_problemModel->gCost( current_node, neigh ) );
+
 			if( hasBetterEqualNode( m_openList, neigh ) || hasBetterEqualNode( m_closeList, neigh ) )
 			{
 				continue;
@@ -137,6 +139,8 @@ private:
 			removeDuplicates( m_closeList, neigh );
 			removeDuplicates( m_openList, neigh );
 
+			neigh->H( m_problemModel->hCost( neigh, m_targetNode ) );
+			neigh->computeF();
 			neigh->Parent(current_node);
 			m_openList.push_back(neigh);
 		}
