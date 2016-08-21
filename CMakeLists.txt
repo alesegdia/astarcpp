@@ -10,9 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin)
 
 set(ASTAR_SOURCES
 	src/astar.h
-	src/astar.cpp
-	src/astarnode.h
-	src/astarnode.cpp)
+	src/astar.cpp)
 
 # DEFINE VORONOI TESTS #####################################################
 
