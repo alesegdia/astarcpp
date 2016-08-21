@@ -1,5 +1,6 @@
 
 #include <cstdio>
+#include <memory>
 
 #include "matrix.h"
 #include "../../astar.h"
@@ -13,13 +14,24 @@ public:
 	class Node : public AStarNode<Node>
 	{
 	public:
-		typedef Node* Ptr;
+		typedef std::shared_ptr<Node> Ptr;
 		Node( int x, int y ) : m_x(x), m_y(y) { }
 		int x() { return m_x; }
 		int y() { return m_y; }
 
+		Ptr Parent() const
+		{
+			return m_parent;
+		}
+		void Parent( Ptr node )
+		{
+			m_parent = node;
+		}
+
 	private:
+		Node::Ptr m_parent;
 		int m_x, m_y;
+
 	};
 
 	typedef TilemapModel* Ptr;
@@ -31,11 +43,31 @@ public:
 
 	}
 
+	float manhattanDistance( NodePtr n1, NodePtr n2 )
+	{
+		int dx = n1->x() - n2->x();
+		int dy = n1->y() - n2->y();
+		int dist = abs(dx) + abs(dy);
+		return dist;
+	}
+
+	float euclideanDistance( NodePtr n1, NodePtr n2 )
+	{
+		float dx = float(n1->x()) - float(n2->x());
+		float dy = float(n1->y()) - float(n2->y());
+		return sqrtf(dx * dx + dy * dy);
+	}
+
 	float distance( NodePtr n1, NodePtr n2 )
 	{
-		float dx = n1->x() - n2->x();
-		float dy = n1->y() - n2->y();
-		return sqrtf( dx * dx + dy * dy );
+		return manhattanDistance(n1, n2);
+	}
+
+	void computeNodeCosts( NodePtr parent, NodePtr child, NodePtr target_node )
+	{
+		child->G( parent->G() + 1 );
+		child->H( distance(child, target_node) );
+		child->computeF();
 	}
 
 	std::vector<NodePtr> getNeighboors( NodePtr node, NodePtr target_node )
@@ -47,34 +79,26 @@ public:
 
 		if( x > 0 && m_map.get( x - 1, y ) == 0 )
 		{
-			neighboors.push_back(new Node( x - 1, y ));
-			neighboors.back()->GCost(node->GCost() + 1);
-			neighboors.back()->HCost(distance(node, target_node));
-			neighboors.back()->Parent(node);
+			neighboors.push_back(std::make_shared<Node>( x - 1, y ));
+			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( x < m_map.cols() - 1 && m_map.get( x + 1, y ) == 0 )
 		{
-			neighboors.push_back(new Node( x + 1, y ));
-			neighboors.back()->GCost(node->GCost() + 1);
-			neighboors.back()->HCost(distance(node, target_node));
-			neighboors.back()->Parent(node);
+			neighboors.push_back(std::make_shared<Node>( x + 1, y ));
+			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( y > 0 && m_map.get( x, y - 1 ) == 0 )
 		{
-			neighboors.push_back(new Node( x, y - 1 ));
-			neighboors.back()->GCost(node->GCost() + 1);
-			neighboors.back()->HCost(distance(node, target_node));
-			neighboors.back()->Parent(node);
+			neighboors.push_back(std::make_shared<Node>( x, y - 1 ));
+			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		if( y < m_map.rows() - 1 && m_map.get( x, y + 1 ) == 0 )
 		{
-			neighboors.push_back(new Node( x, y + 1 ));
-			neighboors.back()->GCost(node->GCost() + 1);
-			neighboors.back()->HCost(distance(node, target_node));
-			neighboors.back()->Parent(node);
+			neighboors.push_back(std::make_shared<Node>( x, y + 1 ));
+			computeNodeCosts( node, neighboors.back(), target_node );
 		}
 
 		return neighboors;
@@ -109,14 +133,17 @@ int main( int argc, char** argv )
 								  0,0,0,0,0,0,0,0,0,0, } };
 	TilemapModel tilemap_model(tilemap);
 	AStar<TilemapModel> astar(&tilemap_model);
-	TilemapModel::Node::Ptr start_node = new TilemapModel::Node(0, 0);
-	TilemapModel::Node::Ptr target_node = new TilemapModel::Node(5, 5);
+	TilemapModel::Node::Ptr start_node = std::make_shared<TilemapModel::Node>(0, 0);
+	TilemapModel::Node::Ptr target_node = std::make_shared<TilemapModel::Node>(9, 9);
+
+	start_node->G(0);
+	start_node->H(tilemap_model.distance(start_node, target_node));
+	start_node->computeF();
+
 	astar.restartSearch(start_node, target_node);
 
 	while( false == astar.step() );
 
-	delete start_node;
-	delete target_node;
-	printf("exit\n");
+	std::cout << astar.processedNodes() << std::endl;
 	return 0;
 }
