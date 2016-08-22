@@ -87,6 +87,11 @@ public:
 		return m_data;
 	}
 
+	void data( std::initializer_list<T> il )
+	{
+		m_data = il;
+	}
+
 private:
 
 	int coordToIndex( int x, int y ) const
