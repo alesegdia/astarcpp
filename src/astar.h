@@ -93,6 +93,21 @@ public:
 		m_currentNode = start_node;
 	}
 
+	void computeSolution()
+	{
+		NodePtr n = m_targetNode;
+		while( nullptr != n )
+		{
+			m_solution.insert(m_solution.begin(), n);
+			n = n->Parent();
+		}
+	}
+
+	const std::vector<NodePtr>& solution() const
+	{
+		return m_solution;
+	}
+
 	AStarSearchStatus step()
 	{
 		// stats
@@ -102,6 +117,8 @@ public:
 		if( m_problemModel->equal(m_targetNode, m_currentNode) )
 		{
 			m_searchStatus = AStarSearchStatus::Finished;
+			m_targetNode->Parent(m_currentNode);
+			computeSolution();
 		}
 		else
 		{
@@ -193,5 +210,6 @@ private:
 	size_t m_processedNodes = 0;
 	NodePtr m_currentNode;
 	AStarSearchStatus m_searchStatus = AStarSearchStatus::Uninitialised;
+	std::vector<NodePtr> m_solution;
 
 };

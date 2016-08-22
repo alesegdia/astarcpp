@@ -81,6 +81,7 @@ public:
 				cairo_rectangle(ctx, i * SCALE + SCALE / 4, j * SCALE + SCALE / 4, SCALE / 2, SCALE / 2 );
 			}
 		}
+		drawNodes( m_astar->solution(), 0.45, 0.78, 1 );
 
 	}
 
