@@ -82,6 +82,7 @@ public:
 		m_targetNode = target_node;
 		m_openList.push_back(start_node);
 		m_processedNodes = 0;
+		m_currentNode = start_node;
 	}
 
 	bool step()
@@ -90,16 +91,16 @@ public:
 		m_processedNodes++;
 
 		bool ret = false;
-		NodePtr current_node = popBestNode();
-		if( m_problemModel->equal(m_targetNode, current_node) )
+		m_currentNode = popBestNode();
+		if( m_problemModel->equal(m_targetNode, m_currentNode) )
 		{
 			ret = true;
 		}
 		else
 		{
-			processNode( current_node );
+			processNode( m_currentNode );
 		}
-		m_closeList.push_back( current_node );
+		m_closeList.push_back( m_currentNode );
 
 		return ret;
 	}
@@ -107,6 +108,21 @@ public:
 	size_t processedNodes()
 	{
 		return m_processedNodes;
+	}
+
+	const std::vector<NodePtr>& openList() const
+	{
+		return m_openList;
+	}
+
+	const std::vector<NodePtr>& closeList() const
+	{
+		return m_closeList;
+	}
+
+	const NodePtr& currentNode() const
+	{
+		return m_currentNode;
 	}
 
 private:
@@ -162,5 +178,6 @@ private:
 	std::vector<NodePtr> m_closeList;
 	NodePtr m_targetNode;
 	size_t m_processedNodes = 0;
+	NodePtr m_currentNode;
 
 };
