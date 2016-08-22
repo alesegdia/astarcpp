@@ -47,6 +47,12 @@ private:
 
 };
 
+enum class AStarSearchStatus {
+	Uninitialised,
+	Finished,
+	Running,
+};
+
 template <typename ProblemModel>
 class AStar
 {
@@ -69,6 +75,8 @@ class AStar
 	}
 
 public:
+
+
 	AStar( typename ProblemModel::Ptr problem_model )
 		: m_problemModel(problem_model)
 	{
@@ -85,24 +93,24 @@ public:
 		m_currentNode = start_node;
 	}
 
-	bool step()
+	AStarSearchStatus step()
 	{
 		// stats
 		m_processedNodes++;
 
-		bool ret = false;
 		m_currentNode = popBestNode();
 		if( m_problemModel->equal(m_targetNode, m_currentNode) )
 		{
-			ret = true;
+			m_searchStatus = AStarSearchStatus::Finished;
 		}
 		else
 		{
+			m_searchStatus = AStarSearchStatus::Running;
 			processNode( m_currentNode );
 		}
 		m_closeList.push_back( m_currentNode );
 
-		return ret;
+		return m_searchStatus;
 	}
 
 	size_t processedNodes()
@@ -123,6 +131,11 @@ public:
 	const NodePtr& currentNode() const
 	{
 		return m_currentNode;
+	}
+
+	AStarSearchStatus status()
+	{
+		return m_searchStatus;
 	}
 
 private:
@@ -179,5 +192,6 @@ private:
 	NodePtr m_targetNode;
 	size_t m_processedNodes = 0;
 	NodePtr m_currentNode;
+	AStarSearchStatus m_searchStatus = AStarSearchStatus::Uninitialised;
 
 };
