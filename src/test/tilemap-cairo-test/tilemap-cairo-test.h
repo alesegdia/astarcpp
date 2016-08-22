@@ -71,16 +71,6 @@ public:
 		drawNode( m_astar->currentNode(), 0, 0, 1 );
 		drawNode( m_targetNode, 0, 1, 1 );
 
-		cairo_set_source_rgb(ctx, 0, 0, 0);
-
-		for( int i = 0; i < 10; i++ )
-		{
-			for( int j = 0; j < 10; j++ )
-			{
-				cairo_set_source_rgb(ctx, 0, 0, 0);
-				cairo_rectangle(ctx, i * SCALE + SCALE / 4, j * SCALE + SCALE / 4, SCALE / 2, SCALE / 2 );
-			}
-		}
 		drawNodes( m_astar->solution(), 0.45, 0.78, 1 );
 
 	}
