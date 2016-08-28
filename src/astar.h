@@ -87,20 +87,13 @@ public:
 	{
 		m_closeList.clear();
 		m_openList.clear();
+		m_solution.clear();
 		m_targetNode = target_node;
 		m_openList.push_back(start_node);
 		m_processedNodes = 0;
+		m_startNode = start_node;
 		m_currentNode = start_node;
-	}
-
-	void computeSolution()
-	{
-		NodePtr n = m_targetNode;
-		while( nullptr != n )
-		{
-			m_solution.insert(m_solution.begin(), n);
-			n = n->Parent();
-		}
+		m_currentNode->Parent(nullptr);
 	}
 
 	const std::vector<NodePtr>& solution() const
@@ -113,11 +106,13 @@ public:
 		// stats
 		m_processedNodes++;
 
+		NodePtr prev_node = m_currentNode;
 		m_currentNode = popBestNode();
 		if( m_problemModel->equal(m_targetNode, m_currentNode) )
 		{
 			m_searchStatus = AStarSearchStatus::Finished;
 			m_targetNode->Parent(m_currentNode);
+			//m_targetNode = m_currentNode;
 			computeSolution();
 		}
 		else
@@ -156,6 +151,16 @@ public:
 	}
 
 private:
+
+	void computeSolution()
+	{
+		NodePtr n = m_targetNode;
+		while( n != nullptr )
+		{
+			m_solution.insert(m_solution.begin(), n);
+			n = n->Parent();
+		}
+	}
 
 	NodePtr popBestNode()
 	{
@@ -209,6 +214,7 @@ private:
 	NodePtr m_targetNode;
 	size_t m_processedNodes = 0;
 	NodePtr m_currentNode;
+	NodePtr m_startNode;
 	AStarSearchStatus m_searchStatus = AStarSearchStatus::Uninitialised;
 	std::vector<NodePtr> m_solution;
 
