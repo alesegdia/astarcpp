@@ -9,6 +9,8 @@ set(ASTAR_SOURCES
 	src/astar.h
 	src/astar.cpp)
 
+include_directories(src)
+
 # BASIC ASTAR TESTS ############################################################
 
 set(ASTAR_TEST_COMMON
