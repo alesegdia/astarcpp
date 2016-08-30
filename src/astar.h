@@ -50,6 +50,7 @@ private:
 enum class AStarSearchStatus {
 	Uninitialised,
 	Finished,
+	Blocked,
 	Running,
 };
 
@@ -106,22 +107,27 @@ public:
 		// stats
 		m_processedNodes++;
 
-		NodePtr prev_node = m_currentNode;
-		m_currentNode = popBestNode();
-		if( m_problemModel->equal(m_targetNode, m_currentNode) )
+		if( m_openList.size() > 0 )
 		{
-			m_searchStatus = AStarSearchStatus::Finished;
-			m_targetNode->Parent(m_currentNode);
-			//m_targetNode = m_currentNode;
-			computeSolution();
+			m_currentNode = popBestNode();
+			if( m_problemModel->equal(m_targetNode, m_currentNode) )
+			{
+				m_searchStatus = AStarSearchStatus::Finished;
+				m_targetNode->Parent(m_currentNode);
+				//m_targetNode = m_currentNode;
+				computeSolution();
+			}
+			else
+			{
+				m_searchStatus = AStarSearchStatus::Running;
+				processNode( m_currentNode );
+			}
+			m_closeList.push_back( m_currentNode );
 		}
 		else
 		{
-			m_searchStatus = AStarSearchStatus::Running;
-			processNode( m_currentNode );
+			m_searchStatus = AStarSearchStatus::Blocked;
 		}
-		m_closeList.push_back( m_currentNode );
-
 		return m_searchStatus;
 	}
 
