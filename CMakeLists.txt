@@ -13,18 +13,19 @@ include_directories(src)
 
 # BASIC ASTAR TESTS ############################################################
 
-set(ASTAR_TEST_COMMON
-	src/test/common/matrix.h
-	src/test/common/tilemap-problem.h)
+if(ASTARCPP_ENABLE_TESTS)
+	set(ASTAR_TEST_COMMON
+		src/test/common/matrix.h
+		src/test/common/tilemap-problem.h)
 
-set(ASTAR_BASIC_SEARCH_TEST
-	src/test/tilemap-search-test/main.cpp)
+	set(ASTAR_BASIC_SEARCH_TEST
+		src/test/tilemap-search-test/main.cpp)
 
-add_executable(basic-search-test
-	${ASTAR_SOURCES}
-	${ASTAR_TEST_COMMON}
-	${ASTAR_BASIC_SEARCH_TEST})
-
+	add_executable(basic-search-test
+		${ASTAR_SOURCES}
+		${ASTAR_TEST_COMMON}
+		${ASTAR_BASIC_SEARCH_TEST})
+endif(ASTARCPP_ENABLE_TESTS)
 
 # CAIRO ASTAR TESTS ############################################################
 
